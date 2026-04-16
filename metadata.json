@@ -1,0 +1,6 @@
+{
+  "name": "Clínica Juliana Nardaci",
+  "description": "Sistema de gestão completo para clínica de estética com CRUD de clientes, profissionais, fornecedores, tratamentos e atendimentos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
