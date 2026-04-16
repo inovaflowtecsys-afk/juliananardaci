@@ -89,50 +89,57 @@ export const TreatmentsPage: React.FC = () => {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-[#dcc8a1] bg-[#fffdfa] shadow-[0_18px_40px_rgba(223,198,150,0.10)]">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome do Tratamento</TableHead>
-              <TableHead>Valor</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTreatments.length > 0 ? (
-              filteredTreatments.map((treatment) => (
-                <TableRow key={treatment.id}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f4e8cf] text-[#7e6746]">
-                        <Syringe size={16} />
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome do Tratamento</TableHead>
+                <TableHead className="hidden md:table-cell">Valor</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredTreatments.length > 0 ? (
+                filteredTreatments.map((treatment) => (
+                  <TableRow key={treatment.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f4e8cf] text-[#7e6746] flex-shrink-0">
+                            <Syringe size={16} />
+                          </div>
+                          <span>{treatment.nome}</span>
+                        </div>
+                        <div className="md:hidden text-xs text-[#8a7452] ml-11">
+                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(treatment.valor)}
+                        </div>
                       </div>
-                      {treatment.nome}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(treatment.valor)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(treatment)}>
-                        <Edit2 size={16} className="text-[#6d5a3d]" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(treatment.id)}>
-                        <Trash2 size={16} className="text-destructive" />
-                      </Button>
-                    </div>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(treatment.valor)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(treatment)} className="h-8 w-8">
+                          <Edit2 size={14} className="text-[#6d5a3d]" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(treatment.id)} className="h-8 w-8">
+                          <Trash2 size={14} className="text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} className="h-24 text-center text-[#8a7452]">
+                    Nenhum tratamento encontrado.
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={3} className="h-24 text-center text-[#8a7452]">
-                  Nenhum tratamento encontrado.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

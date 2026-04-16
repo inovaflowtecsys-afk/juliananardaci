@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { MaskedInput } from '@/components/MaskedInput';
 import { FormSectionHeader } from '@/components/FormSectionHeader';
 import { toast } from 'sonner';
-import { formatPhone, isValidCpf, onlyDigits } from '@/lib/utils';
+import { formatPhone, isValidCpf, onlyDigits, formatCpf } from '@/lib/utils';
 
 const emptyAddress: Address = {
   cep: '',
@@ -83,7 +83,7 @@ export const ClientsPage: React.FC = () => {
 
   const filteredClients = clients.filter(c => 
     c.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.cpf.includes(searchTerm) ||
+    onlyDigits(c.cpf).includes(onlyDigits(searchTerm)) ||
     c.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -185,57 +185,65 @@ export const ClientsPage: React.FC = () => {
           </div>
 
           <div className="overflow-hidden rounded-xl border border-[#dcc8a1] bg-[#fffdfa] shadow-[0_18px_40px_rgba(223,198,150,0.10)]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>CPF</TableHead>
-                  <TableHead>Contato</TableHead>
-                  <TableHead>Cidade/UF</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredClients.length > 0 ? (
-                  filteredClients.map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f4e8cf] text-[#7e6746]">
-                            <User size={16} />
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead className="hidden md:table-cell">CPF</TableHead>
+                    <TableHead className="hidden lg:table-cell">Contato</TableHead>
+                    <TableHead className="hidden md:table-cell">Cidade/UF</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredClients.length > 0 ? (
+                    filteredClients.map((client) => (
+                      <TableRow key={client.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f4e8cf] text-[#7e6746] flex-shrink-0">
+                                <User size={16} />
+                              </div>
+                              <span>{client.nome}</span>
+                            </div>
+                            <div className="md:hidden flex flex-col gap-0.5 text-xs text-[#8a7452] ml-11">
+                              <span>{formatCpf(client.cpf)}</span>
+                              <span>{formatPhone(client.celular)}</span>
+                            </div>
                           </div>
-                          {client.nome}
-                        </div>
-                      </TableCell>
-                      <TableCell>{client.cpf}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="text-sm">{formatPhone(client.celular)}</span>
-                          <span className="text-xs text-[#8a7452]">{client.email}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>{client.endereco.cidade}/{client.endereco.uf}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(client)}>
-                            <Edit2 size={16} className="text-[#6d5a3d]" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(client.id)}>
-                            <Trash2 size={16} className="text-destructive" />
-                          </Button>
-                        </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">{formatCpf(client.cpf)}</TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          <div className="flex flex-col">
+                            <span className="text-sm">{formatPhone(client.celular)}</span>
+                            <span className="text-xs text-[#8a7452]">{client.email}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">{client.endereco.cidade}/{client.endereco.uf}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => openEdit(client)} className="h-8 w-8">
+                              <Edit2 size={14} className="text-[#6d5a3d]" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDelete(client.id)} className="h-8 w-8">
+                              <Trash2 size={14} className="text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="h-24 text-center text-[#8a7452]">
+                        Nenhum cliente encontrado.
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-[#8a7452]">
-                      Nenhum cliente encontrado.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </>
       ) : (

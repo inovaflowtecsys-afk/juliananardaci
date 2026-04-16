@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { FormSectionHeader } from '@/components/FormSectionHeader';
 import { toast } from 'sonner';
-import { isValidCpf, onlyDigits } from '@/lib/utils';
+import { isValidCpf, onlyDigits, formatCpf } from '@/lib/utils';
 
 const MAX_PHOTO_SIZE_BYTES = 2 * 1024 * 1024;
 
@@ -107,7 +107,7 @@ export const ProfessionalsPage: React.FC = () => {
 
   const filteredProfessionals = professionals.filter(p => 
     p.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.cpf.includes(searchTerm) ||
+    onlyDigits(p.cpf).includes(onlyDigits(searchTerm)) ||
     p.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -236,75 +236,83 @@ export const ProfessionalsPage: React.FC = () => {
           </div>
 
           <div className="overflow-hidden rounded-xl border border-[#dcc8a1] bg-[#fffdfa] shadow-[0_18px_40px_rgba(223,198,150,0.10)]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Cargo</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Contato</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProfessionals.length > 0 ? (
-                  filteredProfessionals.map((prof) => (
-                    <TableRow key={prof.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-3">
-                          {prof.fotoBase64 ? (
-                            <img
-                              src={prof.fotoBase64}
-                              alt={prof.nome}
-                              className="h-8 w-8 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f4e8cf] text-[#7e6746]">
-                              <User size={16} />
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead className="hidden md:table-cell">Cargo</TableHead>
+                    <TableHead className="hidden lg:table-cell">Status</TableHead>
+                    <TableHead className="hidden md:table-cell">Contato</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredProfessionals.length > 0 ? (
+                    filteredProfessionals.map((prof) => (
+                      <TableRow key={prof.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-3">
+                              {prof.fotoBase64 ? (
+                                <img
+                                  src={prof.fotoBase64}
+                                  alt={prof.nome}
+                                  className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+                                />
+                              ) : (
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f4e8cf] text-[#7e6746] flex-shrink-0">
+                                  <User size={16} />
+                                </div>
+                              )}
+                              <span>{prof.nome}</span>
                             </div>
-                          )}
-                          {prof.nome}
-                        </div>
-                      </TableCell>
-                      <TableCell>{prof.cargo}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                            prof.status === 'Ativo'
-                              ? 'bg-[#ece6d8] text-slate-700'
-                              : 'bg-[#f6d4d4] text-[#8a1f1f]'
-                          }`}
-                        >
-                          {prof.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="text-sm">{prof.celular}</span>
-                          <span className="text-xs text-[#8a7452]">{prof.email}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(prof)}>
-                            <Edit2 size={16} className="text-[#6d5a3d]" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(prof.id)}>
-                            <Trash2 size={16} className="text-destructive" />
-                          </Button>
-                        </div>
+                            <div className="md:hidden flex flex-col gap-0.5 text-xs text-[#8a7452] ml-11">
+                              <span>{prof.cargo}</span>
+                              <span>{prof.celular}</span>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">{prof.cargo}</TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          <span
+                            className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                              prof.status === 'Ativo'
+                                ? 'bg-[#ece6d8] text-slate-700'
+                                : 'bg-[#f6d4d4] text-[#8a1f1f]'
+                            }`}
+                          >
+                            {prof.status}
+                          </span>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <div className="flex flex-col">
+                            <span className="text-sm">{prof.celular}</span>
+                            <span className="text-xs text-[#8a7452]">{prof.email}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => openEdit(prof)} className="h-8 w-8">
+                              <Edit2 size={14} className="text-[#6d5a3d]" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDelete(prof.id)} className="h-8 w-8">
+                              <Trash2 size={14} className="text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="h-24 text-center text-[#8a7452]">
+                        Nenhum profissional encontrado.
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-[#8a7452]">
-                      Nenhum profissional encontrado.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </>
       ) : (

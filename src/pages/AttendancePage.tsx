@@ -126,66 +126,73 @@ export const AttendancePage: React.FC = () => {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-[#dcc8a1] bg-[#fffdfa] shadow-[0_18px_40px_rgba(223,198,150,0.10)]">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Data</TableHead>
-              <TableHead>Cliente</TableHead>
-              <TableHead>Tratamento</TableHead>
-              <TableHead>Profissional</TableHead>
-              <TableHead>Valor</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredAttendances.length > 0 ? (
-              filteredAttendances.map((attendance) => {
-                const client = clients.find(c => c.id === attendance.clientId);
-                const treatment = treatments.find(t => t.id === attendance.treatmentId);
-                const professional = professionals.find(p => p.id === attendance.professionalId);
-                
-                return (
-                  <TableRow key={attendance.id}>
-                    <TableCell className="whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <CalendarIcon size={14} className="text-[#b79d74]" />
-                        {new Date(attendance.dataAtendimento).toLocaleDateString('pt-BR')}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">{client?.nome || 'N/A'}</TableCell>
-                    <TableCell>{treatment?.nome || 'N/A'}</TableCell>
-                    <TableCell>{professional?.nome || 'N/A'}</TableCell>
-                    <TableCell>
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(attendance.valor)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className={statusColors[attendance.status]}>
-                        {attendance.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(attendance)}>
-                          <Edit2 size={16} className="text-[#6d5a3d]" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(attendance.id)}>
-                          <Trash2 size={16} className="text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-[#8a7452]">
-                  Nenhum atendimento encontrado.
-                </TableCell>
+                <TableHead>Data</TableHead>
+                <TableHead className="hidden md:table-cell">Cliente</TableHead>
+                <TableHead className="hidden lg:table-cell">Tratamento</TableHead>
+                <TableHead className="hidden lg:table-cell">Profissional</TableHead>
+                <TableHead className="hidden md:table-cell">Valor</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredAttendances.length > 0 ? (
+                filteredAttendances.map((attendance) => {
+                  const client = clients.find(c => c.id === attendance.clientId);
+                  const treatment = treatments.find(t => t.id === attendance.treatmentId);
+                  const professional = professionals.find(p => p.id === attendance.professionalId);
+                  
+                  return (
+                    <TableRow key={attendance.id}>
+                      <TableCell className="whitespace-nowrap">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <CalendarIcon size={14} className="text-[#b79d74]" />
+                            {new Date(attendance.dataAtendimento).toLocaleDateString('pt-BR')}
+                          </div>
+                          <div className="md:hidden text-xs text-[#8a7452]">
+                            {client?.nome || 'N/A'}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell font-medium">{client?.nome || 'N/A'}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{treatment?.nome || 'N/A'}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{professional?.nome || 'N/A'}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(attendance.valor)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className={statusColors[attendance.status]}>
+                          {attendance.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => openEdit(attendance)} className="h-8 w-8">
+                            <Edit2 size={14} className="text-[#6d5a3d]" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(attendance.id)} className="h-8 w-8">
+                            <Trash2 size={14} className="text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center text-[#8a7452]">
+                    Nenhum atendimento encontrado.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

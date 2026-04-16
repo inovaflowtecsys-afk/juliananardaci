@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Label } from '@/components/ui/label';
 import { MaskedInput } from '@/components/MaskedInput';
 import { FormSectionHeader } from '@/components/FormSectionHeader';
-import { isValidCpfOrCnpj, onlyDigits } from '@/lib/utils';
+import { isValidCpfOrCnpj, onlyDigits, formatCpfOrCnpj } from '@/lib/utils';
 import { toast } from 'sonner';
 
 const emptyAddress: Address = {
@@ -84,7 +84,7 @@ export const SuppliersPage: React.FC = () => {
   const filteredSuppliers = suppliers.filter(s => 
     s.nomeFantasia.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.razaoSocial.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.documento.includes(searchTerm)
+    onlyDigits(s.documento).includes(onlyDigits(searchTerm))
   );
 
   const handleSave = () => {
@@ -191,55 +191,63 @@ export const SuppliersPage: React.FC = () => {
           </div>
 
           <div className="overflow-hidden rounded-xl border border-[#dcc8a1] bg-[#fffdfa] shadow-[0_18px_40px_rgba(223,198,150,0.10)]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome Fantasia</TableHead>
-                  <TableHead>Documento</TableHead>
-                  <TableHead>Contato</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredSuppliers.length > 0 ? (
-                  filteredSuppliers.map((supp) => (
-                    <TableRow key={supp.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f4e8cf] text-[#7e6746]">
-                            <Building2 size={16} />
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome Fantasia</TableHead>
+                    <TableHead className="hidden md:table-cell">Documento</TableHead>
+                    <TableHead className="hidden lg:table-cell">Contato</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSuppliers.length > 0 ? (
+                    filteredSuppliers.map((supp) => (
+                      <TableRow key={supp.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f4e8cf] text-[#7e6746] flex-shrink-0">
+                                <Building2 size={16} />
+                              </div>
+                              <span>{supp.nomeFantasia}</span>
+                            </div>
+                            <div className="md:hidden flex flex-col gap-0.5 text-xs text-[#8a7452] ml-11">
+                              <span>{formatCpfOrCnpj(supp.documento)}</span>
+                              <span>{supp.nomeContato}</span>
+                            </div>
                           </div>
-                          {supp.nomeFantasia}
-                        </div>
-                      </TableCell>
-                      <TableCell>{supp.documento}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="text-sm">{supp.nomeContato}</span>
-                          <span className="text-xs text-[#8a7452]">{supp.celular}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(supp)}>
-                            <Edit2 size={16} className="text-[#6d5a3d]" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(supp.id)}>
-                            <Trash2 size={16} className="text-destructive" />
-                          </Button>
-                        </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">{formatCpfOrCnpj(supp.documento)}</TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          <div className="flex flex-col">
+                            <span className="text-sm">{supp.nomeContato}</span>
+                            <span className="text-xs text-[#8a7452]">{supp.celular}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => openEdit(supp)} className="h-8 w-8">
+                              <Edit2 size={14} className="text-[#6d5a3d]" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDelete(supp.id)} className="h-8 w-8">
+                              <Trash2 size={14} className="text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className="h-24 text-center text-[#8a7452]">
+                        Nenhum fornecedor encontrado.
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center text-[#8a7452]">
-                      Nenhum fornecedor encontrado.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </>
       ) : (

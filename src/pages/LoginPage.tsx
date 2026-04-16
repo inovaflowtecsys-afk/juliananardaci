@@ -5,11 +5,12 @@ import { Input } from '@/components/ui/input';
 
 interface LoginPageProps {
   onLogin: (credentials: { email: string; password: string }) => Promise<void> | void;
+  onRegisterClick?: () => void;
   demoPassword: string;
   demoAccounts: Array<{ email: string; cargo: string; status: 'Ativo' | 'Inativo' }>;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, demoPassword, demoAccounts }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onRegisterClick, demoPassword, demoAccounts }) => {
   const [email, setEmail] = React.useState('admin@clinica.com');
   const [password, setPassword] = React.useState(demoPassword);
   const [error, setError] = React.useState('');

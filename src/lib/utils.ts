@@ -59,3 +59,26 @@ export function isValidCpfOrCnpj(value: string) {
   if (digits.length === 14) return isValidCnpj(digits);
   return false;
 }
+
+export function formatCpf(value: string) {
+  const cleaned = onlyDigits(value);
+  if (cleaned.length <= 3) return cleaned;
+  if (cleaned.length <= 6) return cleaned.replace(/(\d{3})(\d+)/, '$1.$2');
+  if (cleaned.length <= 9) return cleaned.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
+  return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+}
+
+export function formatCnpj(value: string) {
+  const cleaned = onlyDigits(value);
+  if (cleaned.length <= 2) return cleaned;
+  if (cleaned.length <= 5) return cleaned.replace(/(\d{2})(\d+)/, '$1.$2');
+  if (cleaned.length <= 8) return cleaned.replace(/(\d{2})(\d{3})(\d+)/, '$1.$2.$3');
+  if (cleaned.length <= 12) return cleaned.replace(/(\d{2})(\d{3})(\d{3})(\d+)/, '$1.$2.$3/$4');
+  return cleaned.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+}
+
+export function formatCpfOrCnpj(value: string) {
+  const cleaned = onlyDigits(value);
+  if (cleaned.length <= 11) return formatCpf(value);
+  return formatCnpj(value);
+}
