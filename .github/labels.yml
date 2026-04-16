@@ -41,3 +41,15 @@
 - name: "priority: low"
   color: "0e8a16"
   description: "Baixa prioridade"
+
+- name: "semver: major"
+  color: "b60205"
+  description: "Incremento de versao maior"
+
+- name: "semver: minor"
+  color: "1d76db"
+  description: "Incremento de versao menor"
+
+- name: "semver: patch"
+  color: "0e8a16"
+  description: "Incremento de correcao"

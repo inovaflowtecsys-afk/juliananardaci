@@ -1,0 +1,61 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+
+change-template: "- $TITLE (#$NUMBER) por @$AUTHOR"
+no-changes-template: "Sem mudancas relevantes para esta release."
+
+template: |
+  ## O que mudou
+
+  $CHANGES
+
+  ## Contribuidores
+
+  $CONTRIBUTORS
+
+categories:
+  - title: "Funcionalidades"
+    labels:
+      - "type: feature"
+
+  - title: "Correcao de bugs"
+    labels:
+      - "type: bug"
+
+  - title: "Ajustes de interface"
+    labels:
+      - "type: ui"
+
+  - title: "Documentacao"
+    labels:
+      - "type: docs"
+
+  - title: "Manutencao"
+    labels:
+      - "type: chore"
+
+exclude-labels:
+  - "status: blocked"
+
+version-resolver:
+  major:
+    labels:
+      - "semver: major"
+  minor:
+    labels:
+      - "semver: minor"
+  patch:
+    labels:
+      - "semver: patch"
+  default: patch
+
+autolabeler:
+  - label: "type: docs"
+    files:
+      - "*.md"
+      - "docs/**"
+
+  - label: "type: ui"
+    files:
+      - "src/components/**"
+      - "src/pages/**"
